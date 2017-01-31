@@ -32,20 +32,19 @@ class User(Document):
 class Monitors(Document):
     name         = StringField(max_length=120, required=True)
     user         = ReferenceField(User)
-    date         = DateTimeField()
-    wasNotified  = BooleanField()
-    notifiedWith = ListField(StringField(max_length=30))
+    creationdate = DateTimeField(default=datetime.now())
+    frequency    = DecimalField() # check every x second
+    monitorType  = StringField()
     meta         = {'allow_inheritance': True}
 
 
 # monitoring du protocol HTTP, send HTTP GET request every x second
 class httpMonitors(Monitors):
-    status = StringField()
+    url    = StringField()
 
 # monitoring du ssl certificate
 class sslMonitors(Monitors):
-    expired        = BooleanField()
-    expirationDate = DateTimeField()
+    url    = StringField()
 
 signals.pre_save.connect(User.pre_save, sender=User)
 signals.post_save.connect(User.post_save, sender=User)
