@@ -14,15 +14,15 @@ app.logger.setLevel(logging.INFO)
 def index():
     return "Micro service is running"
 
-@app.route('/monitors/',method = ['GET','POST'])
-def users():
+@app.route('/monitors/', methods = ['GET','POST'])
+def monitors():
     if request.method == 'GET':
-        users = Monitors.objects.all()
+        monitor = Monitors.objects().to_json()
         try :
-            users = json.dumps(users)
+            monitor = json.dumps(monitor)
         except TypeError:
-            users = "{}"
-        return users
+            monitor = "{}"
+        return monitor
     if request.method == 'POST':
         if not request.json or not 'name' in request.json:
             return not_found()
@@ -30,7 +30,36 @@ def users():
         monitor.name = request.json['name']
         monitor.monitorType = request.json['type']
         monitor.frequency = request.json['frequency']
+        logging.debug(monitor)
+        monitor.save()
+        return json.dumps({"status":"ok","message":"monitor created"})
 
+@app.route('/monitors/<int:id>', methods=['PUT'])
+def updateMonitor(id):
+    monitor = Monitors.objects(id=id).to_json()
+    if len(monitor) == 0:
+        abort(404)
+    if not request.json:
+        abort(400)
+    if 'name' in request.json and type(request.json['name']) != unicode:
+        abort(400)
+    if 'type' in request.json and type(request.json['type']) is not unicode:
+        abort(400)
+    if 'frequency' in request.json and type(request.json['frequency']) is not int:
+        abort(400)
+    monitor.name = request.json['name']
+    monitor.type = request.json['type']
+    monitor.frequency = request.json['frequency']
+    monitor.sava()
+    return json.dumps({"status":"ok","message":"monitor updated"})
+
+@app.route('/monitors/<int:id>', methods=['DELETE'])
+def deleteMonitor(id):
+    monitor = Monitors.objects(id=id).to_json()
+    if len(monitor) == 0:
+        abort(404)
+    monitor.remove(id=id)
+    return json.dumps({"status":"ok","message":"monitor deleted"})
 
 
 @app.errorhandler(404)
