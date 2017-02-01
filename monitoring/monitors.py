@@ -5,7 +5,6 @@ import logging
 
 app = Flask(__name__)
 app.config.from_object('settings')
-
 file_handler = logging.FileHandler('app.log')
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
@@ -17,9 +16,8 @@ def index():
 @app.route('/monitors/', methods = ['GET','POST'])
 def monitors():
     if request.method == 'GET':
-        monitor = Monitors.objects().to_json()
         try :
-            monitor = json.dumps(monitor)
+            monitor = Monitors.objects().to_json()
         except TypeError:
             monitor = "{}"
         return monitor
@@ -34,7 +32,14 @@ def monitors():
         monitor.save()
         return json.dumps({"status":"ok","message":"monitor created"})
 
-@app.route('/monitors/<int:id>', methods=['PUT'])
+@app.route('/monitors/<id>', methods=['GET'])
+def getMonitor(id):
+    monitor = Monitors.objects(id=id).to_json()
+    if len(monitor) == 0:
+        abort(404)
+    return monitor
+
+@app.route('/monitors/<id>', methods=['PUT'])
 def updateMonitor(id):
     monitor = Monitors.objects(id=id).to_json()
     if len(monitor) == 0:
@@ -53,7 +58,7 @@ def updateMonitor(id):
     monitor.sava()
     return json.dumps({"status":"ok","message":"monitor updated"})
 
-@app.route('/monitors/<int:id>', methods=['DELETE'])
+@app.route('/monitors/<id>', methods=['DELETE'])
 def deleteMonitor(id):
     monitor = Monitors.objects(id=id).to_json()
     if len(monitor) == 0:
