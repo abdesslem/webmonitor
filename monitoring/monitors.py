@@ -19,13 +19,14 @@ def monitors():
         try :
             monitor = Monitors.objects().to_json()
         except TypeError:
-            monitor = "{}"
+            monitor = json.dumps({})
         return monitor
     if request.method == 'POST':
         if not request.json or not 'name' in request.json:
             return not_found()
         monitor = Monitors()
         monitor.name = request.json['name']
+        monitor.url = request.json['url']
         monitor.monitorType = request.json['type']
         monitor.frequency = request.json['frequency']
         logging.debug(monitor)
@@ -54,16 +55,17 @@ def updateMonitor(id):
         abort(400)
     monitor.name = request.json['name']
     monitor.type = request.json['type']
+    monitor.url = request.json['url']
     monitor.frequency = request.json['frequency']
     monitor.sava()
     return json.dumps({"status":"ok","message":"monitor updated"})
 
 @app.route('/monitors/<id>', methods=['DELETE'])
 def deleteMonitor(id):
-    monitor = Monitors.objects(id=id).to_json()
+    monitor = Monitors.objects(id=id)
     if len(monitor) == 0:
         abort(404)
-    monitor.remove(id=id)
+    monitor.delete()
     return json.dumps({"status":"ok","message":"monitor deleted"})
 
 
