@@ -36,6 +36,7 @@ class Monitors(Document):
     frequency    = DecimalField() # check every x second
     monitorType  = StringField()
     url          = StringField()
+    notification = StringField()
     meta         = {'allow_inheritance': True}
 
     @classmethod
@@ -47,33 +48,10 @@ class Monitors(Document):
         logging.debug("Post Save: %s" % document.name)
         if 'created' in kwargs:
             if kwargs['created']:
-                if document.monitorType == 'http':
-                    monitor = httpLogs()
-                    monitor.name = document.name
-                    monitor.save()
-                elif document.monitorType == 'ping':
-                    monitor = sslLogs()
-                    monitor.name = document.name
-                    monitor.save()
-                else :
-                    monitor = sslLogs()
-                    monitor.name = document.name
-                    monitor.save()
                 logging.debug("Created")
             else:
                 logging.debug("Updated")
 
-# monitoring du protocol HTTP, send HTTP GET request every x second
-class httpLogs(Monitors):
-    status    = StringField() # OK or not OK
-
-# monitoring du ssl certificate
-class sslLogs(Monitors):
-    expirationDate = DateTimeField()
-
-# monitoring du ssl certificate
-class pingLogs(Monitors):
-    status = DateTimeField()
 
 signals.pre_save.connect(User.pre_save, sender=User)
 signals.post_save.connect(User.post_save, sender=User)
