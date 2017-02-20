@@ -15,7 +15,7 @@ data = [
         "measurement": "httpLogs",
         "tags": {
             "url": "localhost",
-            "region": "tunisia"
+            "monitor": "name",
             "user"   : "test"
         },
         "fields": {
@@ -24,15 +24,17 @@ data = [
     }
 ]
 
-def checkHTTP(url):
+def checkHTTP(url, name, user):
+
+    data[0]["tags"]["url"]     = url
+    data[0]["tags"]["monitor"] = name
+    data[0]["tags"]["user"]    = user
     try:
-        r = requests.get(url)
+        r = requests.get('http://'+url)
+        if r.status_code == requests.codes.ok:
+            # log in influxdb
+            logger.write(data=data)
     except requests.ConnectionError, e:
-        raise e
-    if r.status_code == requests.codes.ok:
-        # log in influxdb
-        logger.write(data=data)
-    else:
         # log in influxdb
         data[0]["fields"]["status"] = "ko"
         logger.write(data=data)
@@ -41,13 +43,13 @@ def checkHTTP(url):
                               body='test alert')
         print(" [x] Sent 'Alert message'")
 
-
 monitor = Monitors.objects()
 
 for mon in monitor:
-    if mon.url:
-        checkHTTP(mon.url)
+    mon.user = 'test'
+    if mon.url and mon.name and mon.user :
+        checkHTTP(mon.url, mon.name, mon.user)
     else:
-        print "no url"
+        print "missing fields"
 
 connection.close()

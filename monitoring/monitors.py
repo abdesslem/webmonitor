@@ -29,6 +29,7 @@ def monitors():
         monitor.url = request.json['url']
         monitor.monitorType = request.json['type']
         monitor.frequency = request.json['frequency']
+        monitor.notification = request.json['notification']
         logging.debug(monitor)
         monitor.save()
         return json.dumps({"status":"ok","message":"monitor created"})
