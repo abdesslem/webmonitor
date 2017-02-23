@@ -1,14 +1,9 @@
 #!/usr/bin/env python
-import pika
-import logger
+from utils import dbWrite, eventConnector, eventWriter,eventDeconnect
 import requests
 from models import *
 
-# connect to rappitmq
-connection = pika.BlockingConnection(pika.ConnectionParameters(
-        host='localhost'))
-channel = connection.channel()
-channel.queue_declare(queue='alerts')
+connection, channel = eventConnector()
 
 data = [
     {
@@ -33,23 +28,21 @@ def checkHTTP(url, name, user):
         r = requests.get('http://'+url)
         if r.status_code == requests.codes.ok:
             # log in influxdb
-            logger.write(data=data)
+            dbWrite(data=data)
     except requests.ConnectionError, e:
         # log in influxdb
         data[0]["fields"]["status"] = "ko"
-        logger.write(data=data)
-        channel.basic_publish(exchange='',
-                              routing_key='alerts',
-                              body='test alert')
-        print(" [x] Sent 'Alert message'")
+        dbWrite(data=data)
+        eventWriter(channel, data)
 
-monitor = Monitors.objects()
+if __name__ == '__main__':
 
-for mon in monitor:
-    mon.user = 'test'
-    if mon.url and mon.name and mon.user :
-        checkHTTP(mon.url, mon.name, mon.user)
-    else:
-        print "missing fields"
+    monitor = Monitors.objects()
 
-connection.close()
+    for mon in monitor:
+        mon.user = 'test'
+        if mon.url and mon.name and mon.user :
+            checkHTTP(mon.url, mon.name, mon.user)
+        else:
+            print "missing fields"
+    eventDeconnect(connection)
