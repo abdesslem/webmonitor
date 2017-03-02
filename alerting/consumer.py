@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 import pika
-
+import json
 
 def callback(ch, method, properties, body):
-    print(" [x] Received %r" % body)
+    print("Method: {}".format(method))
+    print("Properties: {}".format(properties))
+    data = json.loads(body)
+    print data
+    #print("measurement: {}".format(data['measurement']))
+    #print("fields: {}".format(data['fields']))
+    #print('tags: {}'.format(data['tags']))
 
-
-if __name__ == '__main__':
-
+def alertListner():
     connection = pika.BlockingConnection(pika.ConnectionParameters(
             host='localhost'))
     channel = connection.channel()
@@ -21,4 +25,3 @@ if __name__ == '__main__':
 
     print(' [*] Waiting for messages. To exit press CTRL+C')
     channel.start_consuming()
-

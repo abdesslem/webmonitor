@@ -1,3 +1,4 @@
-DEBUG = True
-
-SECRET_KEY = 'sdfsdf82347$$%$%$%$&fsdfs!!ASx+__WEBB$'
+MAIL_ADDRESS  = "amriabdesslem@gmail.com"
+MAIL_SERVER   = 'smtp.gmail.com'
+MAIL_PORT     = 587
+MAIL_PASSWORD =
