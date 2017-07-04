@@ -3,13 +3,11 @@ import pika
 import json
 
 def callback(ch, method, properties, body):
-    print("Method: {}".format(method))
-    print("Properties: {}".format(properties))
     data = json.loads(body)
-    print data
-    #print("measurement: {}".format(data['measurement']))
-    #print("fields: {}".format(data['fields']))
-    #print('tags: {}'.format(data['tags']))
+    print data[0]['measurement']
+    print data[0]['fields']  
+    print "user"       + data[0]['tags']['user']
+    print "monitor"    + data[0]['tags']['monitor'] 
 
 def alertListner():
     connection = pika.BlockingConnection(pika.ConnectionParameters(

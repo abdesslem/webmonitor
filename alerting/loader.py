@@ -1,7 +1,7 @@
 import imp
 import os
 
-PluginFolder = "./plugins"
+PluginFolder = "plugins"
 MainModule = "__init__.py"
 
 def getPlugins():
@@ -18,5 +18,5 @@ def getPlugins():
 def loadPlugin(plugin):
     return imp.load_module(MainModule, *plugin["info"])
 
-for i in getPlugins():
-    plugin = loadPlugin(i)
+#for i in getPlugins():
+#    plugin = loadPlugin(i)
