@@ -26,6 +26,3 @@ def sendMail(client):
         print 'error while login'
 
     server.quit()
-
-def alert():
-    print "hello" 
