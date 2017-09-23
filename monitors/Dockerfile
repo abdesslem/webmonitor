@@ -6,12 +6,13 @@ WORKDIR /usr/src/app
 
 # Install app dependencies
 COPY requirements.txt /usr/src/app/
-RUN apt-get install Flask mongoengine pika
+#RUN apt-get install Flask mongoengine
+#RUN apt-get install python2.7
 #RUN pip install -i requirements.txt
 
 # Bundle app source
 COPY . /usr/src/app
 
 EXPOSE 8080
-CMD [ "python", "monitors.py" ]
+#CMD [ "python", "monitors.py" ]
 
